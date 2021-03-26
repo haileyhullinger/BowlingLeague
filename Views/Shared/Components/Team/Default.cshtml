@@ -1,0 +1,13 @@
+﻿@model IEnumerable<Teams>
+
+<a asp-action="Index" asp-controller="Home" asp-route-teamid=""> Home </a>
+<br />
+<!--bring in each unique team name from the view component-->
+@foreach (var x in Model)
+{
+    <!--bring in each team as a link-->
+    <a asp-action="Index" asp-controller="Home" 
+       asp-route-teamid="@x.TeamId" 
+       asp-route-teamname="@x.TeamName"> @x.TeamName </a>
+    <br />
+}
