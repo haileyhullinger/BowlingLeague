@@ -16,6 +16,9 @@ namespace BowlingLeague.Components
         }
         public IViewComponentResult Invoke()
         {
+            //for dynamic highlighting
+            ViewBag.SelectedTeam = RouteData?.Values["teamname"];
+
             //Select each unique team object to filter by
             return View(context.Teams
                 .Distinct()

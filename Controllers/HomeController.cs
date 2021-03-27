@@ -1,4 +1,5 @@
 ﻿using BowlingLeague.Models;
+using BowlingLeague.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,13 +27,38 @@ namespace BowlingLeague.Controllers
 
         //if a team name is passed into the view, filter by that team
         //if a team name is not passed in (nullable with the ?) then nothing will be passed in and all team names show up
-        public IActionResult Index(long? teamid)
+        public IActionResult Index(long? teamid, string team, int pageNum = 0)
         {
-            return View(context.Bowlers
-                .FromSqlInterpolated($"SELECT * FROM Bowlers WHERE TeamId = {teamid} OR {teamid} IS NULL")
-                .ToList());
-        }
 
+            int pageSize = 5;
+
+            return View(new IndexViewModel
+            {
+                Bowlers = (context.Bowlers
+                .Where(b => b.TeamId == teamid || teamid == null)
+                .OrderBy(b => b.Team)
+                //pagination
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToList()),
+
+                PageNumberingInfo = new PageNumberingInfo
+                {
+                    NumberItemsPerPage = pageSize,
+                    CurrentPage = pageNum,
+
+                    //if no team has been selected, get the full count. otherwiese, get the count of just the team
+                    TotalNumItems = (teamid == null ? context.Bowlers.Count() :
+                        context.Bowlers.Where(x => x.TeamId == teamid).Count())
+                },
+
+                Team = team
+
+
+            });
+
+        }
+    
         public IActionResult Privacy()
         {
             return View();
